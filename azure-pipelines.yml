@@ -10,7 +10,7 @@ jobs:
     vmImage: 'macOS-10.14'
   variables:
     scheme: ''
-    sdk: 'iphoneos'
+    sdk: 'iphoneos13.2'
     configuration: 'Release'
   steps:
   - task: Xcode@5
@@ -48,7 +48,7 @@ jobs:
     vmImage: 'macOS-10.14'
   variables:
     scheme: ''
-    sdk: 'iphoneos'
+    sdk: 'iphonesimulator'
     configuration: 'Release'
   dependsOn: Analyze
   condition: succeeded()
@@ -76,7 +76,7 @@ jobs:
   steps:
   - task: Xcode@5
     inputs:
-      actions: 'test'
+      actions: 'build'
       sdk: '$(sdk)'
       scheme: '$(scheme)'
       configuration: '$(configuration)'
