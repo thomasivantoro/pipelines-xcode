@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/xcode
 
 jobs:  
-- job: Build
+- job: Build-Analyze-Test
   displayName: 'Xcode Build'
   pool:
     vmImage: 'macOS-10.14'
@@ -14,55 +14,27 @@ jobs:
     configuration: 'Release'
   steps:
   - task: Xcode@5
+    displayName: 'Xcode Clean Build'
     inputs:
       actions: 'clean build'
       sdk: '$(sdk)'
       scheme: '$(scheme)'
       configuration: '$(configuration)'
-      #xcodeVersion: 'default' # Options: default, 10, 9, 8, specifyPath
-      #exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
-      #packageApp: false
-- job: Analyze
-  displayName: 'Xcode Analyze'
-  pool:
-    vmImage: 'macOS-10.14'
-  variables:
-    scheme: ''
-    sdk: 'iphoneos'
-    configuration: 'Release'
-  dependsOn: Build
-  condition: succeeded()
-  steps:
   - task: Xcode@5
+    displayName: 'Xcode Analyze'
     inputs:
       actions: 'analyze'
       sdk: '$(sdk)'
       scheme: '$(scheme)'
       configuration: '$(configuration)'
-      #xcodeVersion: 'default' # Options: default, 10, 9, 8, specifyPath
-      #exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
-      #packageApp: false
-- job: UnitTest
-  displayName: 'Xcode Test'
-  pool:
-    vmImage: 'macOS-10.14'
-  variables:
-    scheme: ''
-    sdk: 'iphonesimulator'
-    configuration: 'Release'
-  dependsOn: Analyze
-  condition: succeeded()
-  steps:
-  - task: Xcode@5
-    inputs:
-      actions: 'test'
-      sdk: '$(sdk)'
-      scheme: '$(scheme)'
-      configuration: '$(configuration)'
-      #xcodeVersion: 'default' # Options: default, 10, 9, 8, specifyPath
-      #exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
-      #packageApp: false
-      publishJUnitResults: true
+  # - task: Xcode@5
+  #   displayName: 
+  #   inputs:
+  #     actions: 'test'
+  #     sdk: 'iphonesimulator'
+  #     scheme: '$(scheme)'
+  #     configuration: '$(configuration)'
+  #     publishJUnitResults: true
 - job: Package
   displayName: 'Xcode Package IPA'
   pool:
@@ -71,7 +43,7 @@ jobs:
     scheme: ''
     sdk: 'iphoneos'
     configuration: 'Release'
-  dependsOn: UnitTest
+  dependsOn: Build-Analyze-Test
   condition: succeeded()
   steps:
   - task: Xcode@5
@@ -80,6 +52,4 @@ jobs:
       sdk: '$(sdk)'
       scheme: '$(scheme)'
       configuration: '$(configuration)'
-      #xcodeVersion: 'default' # Options: default, 10, 9, 8, specifyPath
-      #exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
       packageApp: true
