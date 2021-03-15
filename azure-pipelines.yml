@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/xcode
 
 jobs:  
-- job: Build-Analyze-Test
+- job: Build_Analyze_Test
   displayName: 'Xcode Build'
   pool:
     vmImage: 'macOS-10.14'
@@ -43,7 +43,7 @@ jobs:
     scheme: ''
     sdk: 'iphoneos'
     configuration: 'Release'
-  dependsOn: Build-Analyze-Test
+  dependsOn: Build_Analyze_Test
   condition: succeeded()
   steps:
   - task: Xcode@5
