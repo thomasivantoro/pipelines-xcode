@@ -3,16 +3,59 @@
 # Add steps that install certificates, test, sign, and distribute the app, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/xcode
 
-# https://docs.microsoft.com/azure/devops/pipelines/ecosystems/xcode
-pool:
-  vmImage: 'macOS-10.14'
-
-steps:
-- task: Xcode@5
-  inputs:
-    sdk: '$(sdk)'
-    scheme: '$(scheme)'
-    configuration: '$(configuration)'
-    xcodeVersion: 'default' # Options: default, 10, 9, 8, specifyPath
-    exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
-    packageApp: false
+jobs:  
+- job: 'Build'
+  displayName: 'Xcode Build'
+  pool:
+    vmImage: 'macOS-10.14'
+  variables:
+    scheme: ''
+    sdk: 'iphoneos'
+    configuration: 'Release'
+  steps:
+  - task: Xcode@5
+    inputs:
+      actions: 'clean build'
+      sdk: '$(sdk)'
+      scheme: '$(scheme)'
+      configuration: '$(configuration)'
+      #xcodeVersion: 'default' # Options: default, 10, 9, 8, specifyPath
+      #exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
+      #packageApp: false
+- job: 'Analyze'
+  displayName: 'Xcode Analyze'
+  pool:
+    vmImage: 'macOS-10.14'
+  variables:
+    scheme: ''
+    sdk: 'iphoneos'
+    configuration: 'Release'
+  steps:
+  - task: Xcode@5
+    inputs:
+      actions: 'analyze'
+      sdk: '$(sdk)'
+      scheme: '$(scheme)'
+      configuration: '$(configuration)'
+      #xcodeVersion: 'default' # Options: default, 10, 9, 8, specifyPath
+      #exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
+      #packageApp: false
+- job: 'Test'
+  displayName: 'Xcode Test'
+  pool:
+    vmImage: 'macOS-10.14'
+  variables:
+    scheme: ''
+    sdk: 'iphoneos'
+    configuration: 'Release'
+  steps:
+  - task: Xcode@5
+    inputs:
+      actions: 'test'
+      sdk: '$(sdk)'
+      scheme: '$(scheme)'
+      configuration: '$(configuration)'
+      #xcodeVersion: 'default' # Options: default, 10, 9, 8, specifyPath
+      #exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
+      #packageApp: false
+      publishJUnitResults: true
