@@ -6,11 +6,6 @@
 pool:
   vmImage: 'macOS 10.15'
 
-variables:
-  scheme: ''
-  sdk: 'iphoneos'
-  configuration: 'Release'
-
 steps:
 - task: Xcode@5
   inputs:
