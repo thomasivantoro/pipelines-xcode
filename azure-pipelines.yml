@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/xcode
 
 jobs:  
-- job: 'Build'
+- job: Build
   displayName: 'Xcode Build'
   pool:
     vmImage: 'macOS-10.14'
@@ -22,7 +22,7 @@ jobs:
       #xcodeVersion: 'default' # Options: default, 10, 9, 8, specifyPath
       #exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
       #packageApp: false
-- job: 'Analyze'
+- job: Analyze
   displayName: 'Xcode Analyze'
   pool:
     vmImage: 'macOS-10.14'
@@ -30,6 +30,8 @@ jobs:
     scheme: ''
     sdk: 'iphoneos'
     configuration: 'Release'
+  dependsOn: Build
+  condition: succeeded()
   steps:
   - task: Xcode@5
     inputs:
@@ -40,7 +42,7 @@ jobs:
       #xcodeVersion: 'default' # Options: default, 10, 9, 8, specifyPath
       #exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
       #packageApp: false
-- job: 'Test'
+- job: UnitTest
   displayName: 'Xcode Test'
   pool:
     vmImage: 'macOS-10.14'
@@ -48,6 +50,8 @@ jobs:
     scheme: ''
     sdk: 'iphoneos'
     configuration: 'Release'
+  dependsOn: Analyze
+  condition: succeeded()
   steps:
   - task: Xcode@5
     inputs:
@@ -59,3 +63,23 @@ jobs:
       #exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
       #packageApp: false
       publishJUnitResults: true
+- job: Package
+  displayName: 'Xcode Package IPA'
+  pool:
+    vmImage: 'macOS-10.14'
+  variables:
+    scheme: ''
+    sdk: 'iphoneos'
+    configuration: 'Release'
+  dependsOn: UnitTest
+  condition: succeeded()
+  steps:
+  - task: Xcode@5
+    inputs:
+      actions: 'test'
+      sdk: '$(sdk)'
+      scheme: '$(scheme)'
+      configuration: '$(configuration)'
+      #xcodeVersion: 'default' # Options: default, 10, 9, 8, specifyPath
+      #exportPath: '$(agent.buildDirectory)/output/$(sdk)/$(configuration)'
+      packageApp: true
